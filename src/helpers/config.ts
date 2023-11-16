@@ -10,8 +10,10 @@ export const UP_CONNECTED_ADDRESS = 'up:connected-address'
  * Thus, we do not check what DApp is connected to but rather what tool was used to connect
  * so that we can recreate the connection correctly.
  */
-
+export const MEANS_OF_CONNECTION = 'means-of-connection'
+export const WALLET_CONNECT = 'wallet-connect-v2'
 export const WINDOW_LUKSO = 'window-lukso'
+export const WEB3_ONBOARD = 'web3Onboard'
 
 export const DEFAULT_GAS = 5_000_000
 export const DEFAULT_GAS_PRICE = '10000000000'

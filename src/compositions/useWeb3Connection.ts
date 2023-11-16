@@ -1,18 +1,22 @@
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
   UP_CONNECTED_ADDRESS,
-
+  WALLET_CONNECT,
+  WEB3_ONBOARD,
 } from '@/helpers/config'
-
+import useWalletConnectV2 from './useWalletConnectV2'
+import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
 import { TransactionConfig, TransactionReceipt } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
-import { useState } from '@/stores'
+import { getState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
 
+const web3Onboard = useWeb3Onboard()
+const web3WalletConnectV2 = useWalletConnectV2()
 const { setConnected, setDisconnected } = useState()
 
 const provider = ref<EthereumProvider>()
@@ -32,23 +36,36 @@ const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
     })
 }
 
-const setupProvider = async (): Promise<EthereumProvider | undefined> => {
+const setupProvider = async (
+  meansOfConnection: string
+): Promise<EthereumProvider | undefined> => {
   try {
-   
+    const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
+    const isWeb3OnboardUsed = meansOfConnection === WEB3_ONBOARD
+
     let address = ''
+    if (isWalletConnectUsed) {
+      provider.value = await web3WalletConnectV2.setupWCV2Provider()
+      address = await provider.value.accounts[0]
+      await setupWeb3(provider.value)
+    } else if (isWeb3OnboardUsed) {
+      const primaryWallet = await web3Onboard.setupWeb3Onboard()
+      provider.value = primaryWallet.provider as EthereumProvider
+      address = primaryWallet.accounts[0].address
+      await setupWeb3(provider.value)
+    } else {
+      provider.value = window.lukso
+      await setupWeb3(provider.value as EthereumProvider)
+      let accounts = await web3.eth.getAccounts()
 
-    provider.value = window.lukso
-    await setupWeb3(provider.value as EthereumProvider)
-    let accounts = await web3.eth.getAccounts()
-
-    address = accounts[0]
-    if (!address) {
-      accounts = await requestAccounts()
       address = accounts[0]
+      if (!address) {
+        accounts = await requestAccounts()
+        address = accounts[0]
+      }
     }
-
     if (address) {
-      setConnected(address)
+      setConnected(address, meansOfConnection)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
     return provider.value
@@ -57,16 +74,20 @@ const setupProvider = async (): Promise<EthereumProvider | undefined> => {
 
     if (epError.code === 4100) {
       const address = (await requestAccounts())[0]
-      setConnected(address)
+      setConnected(address, meansOfConnection)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
   }
 }
 
 const disconnect = async () => {
-
-  localStorage.removeItem(UP_CONNECTED_ADDRESS)
-
+  if (getState('channel') == WALLET_CONNECT) {
+    await provider.value?.disconnect()
+  } else if (getState('channel') == WEB3_ONBOARD) {
+    await web3Onboard.disconnect()
+  } else {
+    localStorage.removeItem(UP_CONNECTED_ADDRESS)
+  }
   await setupWeb3(undefined as unknown as EthereumProvider)
   setDisconnected()
 }
@@ -140,7 +161,9 @@ const isAddress = (address: string): boolean => {
 }
 
 export default function useWeb3Connection(): {
-  setupProvider: () => Promise<EthereumProvider | undefined>
+  setupProvider: (
+    meansOfConnection: string
+  ) => Promise<EthereumProvider | undefined>
   getProvider: () => EthereumProvider
   getWeb3: () => Web3
   getChainId: () => Promise<number>

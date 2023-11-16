@@ -1,8 +1,9 @@
 import { reactive } from 'vue'
-import { Store} from '@/types'
+import { Store, Channel } from '@/types'
 import {
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
+  MEANS_OF_CONNECTION,
 } from '@/helpers/config'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
@@ -14,6 +15,7 @@ export const store = reactive<Store>({
   address: '',
   chainId: 0,
   balance: 0,
+  channel: undefined,
   tokenAddress: undefined,
   assets: [],
   lsp7: [],
@@ -34,18 +36,19 @@ export async function setState(
 }
 
 export function useState(): {
-  setConnected: (address: string) => Promise<void>
+  setConnected: (address: string, channel: Channel) => Promise<void>
   setDisconnected: () => void
   recalcTokens: () => Promise<void>
 } {
   return {
-    setConnected: async (address: string) => {
+    setConnected: async (address: string, channel: Channel) => {
       const { getChainId, getBalance, contract } = useWeb3Connection()
 
       setState('address', address)
-
+      setState('channel', channel)
       setState('chainId', await getChainId())
 
+      localStorage.setItem(MEANS_OF_CONNECTION, channel)
 
       window.erc725Account = contract(UniversalProfile.abi as any, address, {
         gasPrice: DEFAULT_GAS_PRICE,
@@ -79,11 +82,13 @@ export function useState(): {
     setDisconnected: () => {
       setState('address', '')
       setState('isConnected', false)
+      setState('channel', undefined)
       setState('chainId', 0)
       setState('balance', 0)
       setState('assets', [])
       setState('lsp7', [])
       setState('lsp8', [])
+      localStorage.removeItem(MEANS_OF_CONNECTION)
 
       window.erc725Account = undefined
     },
