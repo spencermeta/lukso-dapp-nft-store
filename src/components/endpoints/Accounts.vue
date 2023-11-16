@@ -5,6 +5,9 @@ import { getState, useState } from '@/stores'
 
 import {
   getSelectedNetworkConfig,
+  WALLET_CONNECT,
+  WINDOW_LUKSO,
+  WEB3_ONBOARD,
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
@@ -26,13 +29,13 @@ const hexChainId = computed(() => {
 const disconnectWallet = async () => {
   clearNotification()
   await disconnect()
-  setNotification(`Disconnected `, 'info')
+  setNotification(`Disconnected ${getState('channel')} channel`, 'info')
 }
 
-const connectExtension = async () => {
+const connectExtension = async (meansOfConnection: string) => {
   clearNotification()
   try {
-    provider.value = await setupProvider()
+    provider.value = await setupProvider(meansOfConnection)
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
@@ -57,16 +60,44 @@ const handleRefresh = (e: Event) => {
           class="button is-primary is-rounded mb-1"
           :disabled="getState('isConnected')"
           data-testid="connect-extension"
-          @click="connectExtension()"
+          @click="connectExtension(WINDOW_LUKSO)"
         >
           Browser Extension
         </button>
         <span
-          v-if="getState('isConnected')"
+          v-if="getState('channel') === WINDOW_LUKSO && getState('isConnected')"
           class="icon ml-3 mt-1 has-text-primary"
         >
           <i class="fas fa-check"></i>
         </span>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-1"
+          :disabled="getState('isConnected')"
+          data-testid="connect-wc-v2"
+          @click="connectExtension(WALLET_CONNECT)"
+        >
+          Wallet Connect V2
+        </button>
+        <span
+          v-if="
+            getState('channel') === WALLET_CONNECT && getState('isConnected')
+          "
+          class="icon ml-3 mt-4 has-text-primary"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-1"
+          data-testid="connect-w3onboard"
+          :disabled="getState('isConnected')"
+          @click="connectExtension(WEB3_ONBOARD)"
+        >
+          Web3-Onboard
+        </button>
       </div>
       <div class="field">
         <button

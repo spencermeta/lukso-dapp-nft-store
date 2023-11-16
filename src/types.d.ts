@@ -13,6 +13,8 @@ export interface Notification {
 
 export type NotificationType = 'primary' | 'danger' | 'info' | 'warning'
 
+export type Channel = WINDOW_ETHEREUM | WALLET_CONNECT | WEB3_ONBOARD
+
 export enum ContractStandard {
   LSP8 = 'LSP8',
   LSP7 = 'LSP7',
@@ -26,6 +28,7 @@ export interface Store {
   address: string
   chainId: number
   balance: number
+  channel?: Channel
   tokenAddress?: string
   assets: string[]
   lsp7: TokenInfo[]
