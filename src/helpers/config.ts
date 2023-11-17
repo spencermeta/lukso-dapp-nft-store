@@ -130,4 +130,4 @@ export function getSelectedNetworkConfig(): NetworkInfo {
 export const SIGNATURE_LOOKUP_URL =
   'https://4bytesdictionary.universalprofile.cloud'
 
-export const WALLET_CONNECT_PROJECT_ID = '4f90c247328c3e3fed9d514f92b2fdce' // We should put this in .env
+export const WALLET_CONNECT_PROJECT_ID = 'bbcaeb829693f419e49b35513c50266a' // We should put this in .env
