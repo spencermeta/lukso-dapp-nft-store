@@ -24,8 +24,16 @@ import ToddBonzalez from '@/assets/images/Todd Bonzalez.jpg';
 import TonySmehrik from '@/assets/images/Tony Smehrik.jpg';
 import WillieDustice from '@/assets/images/Willie Dustice.jpg';
 
+let visibleLiveModal;
+
 export default {
   name: 'GridCards',
+
+  data() {
+    return {
+      visibleLiveModal: false,
+    }
+  },
   setup() {
     return {
       VueImg,
@@ -53,14 +61,30 @@ export default {
       WillieDustice,
     }
   },
+
 }
 </script>
 
 <template>
 
+  <CModal :visible="visibleLiveModal" @close="() => { visibleLiveModal = false }">
+    <CModalHeader>
+      <CModalTitle>Anatoli Smorin</CModalTitle>
+    </CModalHeader>
+    <CModalBody>Bid for now, Session will be started after the first bid!</CModalBody>
+    <CModalFooter>
+      <CButton color="secondary" @click="() => { visibleLiveModal = false }">
+        Close
+      </CButton>
+      <CButton color="primary">start</CButton>
+    </CModalFooter>
+  </CModal>
+
   <CRow :xs="{ cols: 1, gutter: 4 }" :md="{ cols: 3 }">
     <CCol xs>
-      <CCard>
+
+      <CCard >
+        <CButton @click=" () => {visibleLiveModal=true}">
         <CCardImage orientation="top" :src="AnatoliSmorin" />
         <CCardBody>
           <CCardTitle>Anatoli Smorin</CCardTitle>
@@ -70,7 +94,9 @@ export default {
         <CCardFooter>
           <small class="text-medium-emphasis"></small>
         </CCardFooter>
+        </CButton>
       </CCard>
+
     </CCol>
     <CCol xs>
       <CCard>

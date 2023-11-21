@@ -89,6 +89,39 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     // ERC721
     erc721TokenWithEip165: '0x57b8e4f3C96180088652dc361473bB91266bb080',
   },
+  mainnet: {
+    name: 'mainnet',
+    rpc: {
+      url: 'https://rpc.lukso.gateway.fm',
+    },
+    cache: {
+      url: 'https://erc725cache.mainnet.lukso.network/graphql',
+    },
+    ipfs: {
+      url: 'https://2eff.lukso.dev/ipfs/',
+    },
+    blockscout: {
+      url: 'https://explorer.execution.mainnet.lukso.network',
+    },
+    chainId: 42,
+
+    // The sample values are currently just junk.
+    sampleEoA: '',
+    sampleUP: '',
+    sampleSC: '',
+    errorContract: '',
+    // ERC20
+    erc20TokenWithEip165: '',
+    erc20TokenWithoutEip165: '',
+    // ERC777
+    erc777TokenWithEip165: '',
+    erc777TokenWithoutEip165: '',
+    // LSP7
+    lsp7TokenDivisible: '',
+    lsp7TokenNonDivisible: '',
+    // ERC721
+    erc721TokenWithEip165: '',
+  },
 }
 
 export const PRIVATE_KEY =

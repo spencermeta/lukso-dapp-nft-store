@@ -14,7 +14,6 @@ import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/Ethere
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
-
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
 const { setConnected, setDisconnected } = useState()

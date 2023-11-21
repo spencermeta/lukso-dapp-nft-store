@@ -7,6 +7,7 @@ let provider: EthereumProvider
  * Prepares a WalletConnect V2 provider (EthereumProvider) that manages the WebSocket connection.
  */
 const setupWCV2Provider = async () => {
+
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: Object.entries(NETWORKS).map(net => net[1].chainId),
